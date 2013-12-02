@@ -5,7 +5,7 @@ Script to parse an HDF5 file written by OpenFOAM and write
 corresponding XDMF file(s), allowing the data to be postprocessed.
 """
 
-__author__ = "Håkon Strandenes"
+__author__ = "Hakon Strandenes"
 __email__ = "hakon.strandenes@ntnu.no"
 __copyright__ = "Copyright 2012-2013"
 __license__ = "GPL v3 or later"
@@ -27,7 +27,7 @@ xdmfAttrTypes = {1: 'Scalar', 3: 'Vector', 6: 'Tensor6', 9: 'Tensor'}
 def detectClouds(f):
     # Check if the file contain any clouds
     if ('CLOUDS' in f['/']) is False:
-        print('Note: No clouds present in file \'{}\''.format(args.input))
+        print('Note: No clouds present in file \'{0}\''.format(args.input))
         return False
     
     clouds = list(f['CLOUDS'].keys())
@@ -38,7 +38,7 @@ def detectClouds(f):
 def detectFields(f):
     # Check if the file contain any fields
     if ('MESH' in f) is False or ('FIELDS' in f) is False:
-        print('Error: No mesh and field data in file \'{}\''.format(fileName))
+        print('Error: No mesh and field data in file \'{0}\''.format(fileName))
         return False
     
     return True
@@ -79,28 +79,28 @@ def writeCloud(cloud, fo, args):
             continue
         
         timeName = timeNames[index]
-        pathInFile = '{}:{}/{}'.format(h5Path, cloud.name, timeName)
+        pathInFile = '{0}:{1}/{2}'.format(h5Path, cloud.name, timeName)
         nPoints = cloud[timeName]['position'].shape[0]
         
-        fo.write('      <Grid Name="time{}" Type="Uniform">\n'
+        fo.write('      <Grid Name="time{0}" Type="Uniform">\n'
                  .format(timeValues[index]))
         
-        fo.write('        <Time Type="Single" Value="{}" />\n'
+        fo.write('        <Time Type="Single" Value="{0}" />\n'
                  .format(timeValues[index]))
         
         # Geometry definition
         fo.write('        <Geometry GeometryType="XYZ">\n')
-        fo.write('          <DataStructure Dimensions="{} 3" '
-                 'NumberType="Float" Presicion="{}" Format="HDF" >\n'
+        fo.write('          <DataStructure Dimensions="{0} 3" '
+                 'NumberType="Float" Presicion="{1}" Format="HDF" >\n'
                  .format(nPoints, prec))
         
-        fo.write('            {}/position\n'.format(pathInFile))
+        fo.write('            {0}/position\n'.format(pathInFile))
         fo.write('          </DataStructure>\n')
         fo.write('        </Geometry>\n')
         
         # Topology information
         fo.write('        <Topology Type="Polyvertex" NodesPerElement="1" '
-                 'NumberOfElements="{}">\n'.format(nPoints))
+                 'NumberOfElements="{0}">\n'.format(nPoints))
         
         fo.write('        </Topology>\n')
         
@@ -115,19 +115,19 @@ def writeCloud(cloud, fo, args):
             elif h.dtype in (numpy.dtype('i4'), numpy.dtype('i8')):
                 numberType = 'Int'
             else:
-                print('Error: Cloud \'{}\' was created using an unknown '
+                print('Error: Cloud \'{0}\' was created using an unknown '
                       'number type.'.format(cloud.name))
                 exit(1)
             
             # Write data
-            fo.write('        <Attribute Name="{}" Center="Node" '
-                     'AttributeType="{}">\n'.format(attr, xdmfAttrTypes[nCmp]))
+            fo.write('        <Attribute Name="{0}" Center="Node" '
+                     'AttributeType="{1}">\n'.format(attr, xdmfAttrTypes[nCmp]))
             
-            fo.write('          <DataStructure Dimensions="{} {}" '
-                     'NumberType="{}" Presicion="{}" Format="HDF" >\n'
+            fo.write('          <DataStructure Dimensions="{0} {1}" '
+                     'NumberType="{2}" Presicion="{3}" Format="HDF" >\n'
                      .format(nPoints, nCmp, numberType, prec))
             
-            fo.write('            {}/{}\n'.format(pathInFile, attr))
+            fo.write('            {0}/{1}\n'.format(pathInFile, attr))
             fo.write('          </DataStructure>\n')
             fo.write('        </Attribute>\n')
             
@@ -204,31 +204,31 @@ def writeFields(f, fo, args):
         fo.write('      <Grid GridType="Collection" CollectionType="Spatial">\n'
                  .format(timeValues[index]))
         
-        fo.write('        <Time Type="Single" Value="{}" />\n'
+        fo.write('        <Time Type="Single" Value="{0}" />\n'
                  .format(timeValues[index]))
         
         # Loop over all processes
         i = 0
         for proc in mesh:
-            fo.write('        <Grid Name="time{}-{}" Type="Uniform">\n'
+            fo.write('        <Grid Name="time{0}-{1}" Type="Uniform">\n'
                      .format(timeValues[index], proc))
             
             # Geometry definition
-            fo.write('          <Topology Type="Mixed" NumberOfElements="{}">\n'
+            fo.write('          <Topology Type="Mixed" NumberOfElements="{0}">\n'
                      .format(nCells[i]))
             
-            fo.write('            <DataStructure Dimensions="{}" '
+            fo.write('            <DataStructure Dimensions="{0}" '
                      'NumberType="Int" Format="HDF" >\n'.format(cellLength[i]))
             
-            fo.write('              {}:/MESH/0/{}/CELLS\n'.format(h5Path, proc))
+            fo.write('              {0}:/MESH/0/{1}/CELLS\n'.format(h5Path, proc))
             fo.write('            </DataStructure>\n')
             fo.write('          </Topology>\n')
             fo.write('          <Geometry GeometryType="XYZ">\n')
-            fo.write('            <DataStructure Dimensions="{} 3" '
-                     'NumberType="Float" Presicion="{}" Format="HDF" >\n'
+            fo.write('            <DataStructure Dimensions="{0} 3" '
+                     'NumberType="Float" Presicion="{1}" Format="HDF" >\n'
                      .format(nPoints[i], prec))
             
-            fo.write('              {}:/MESH/0/{}/POINTS\n'
+            fo.write('              {0}:/MESH/0/{1}/POINTS\n'
                      .format(h5Path, proc))
             
             fo.write('            </DataStructure>\n')
@@ -237,17 +237,22 @@ def writeFields(f, fo, args):
             # Loop over all fields
             for field in fields[timeName][proc]:
                 h = fields[timeName][proc][field]
-                nCmp =  int(h.size/h.shape[0])
+#                nCmp =  int(h.size/h.shape[0])
+                if( len(h.shape) > 1):
+                    nCmp = h.shape[1]
+                else:
+                    nCmp = 1
+
                 
-                fo.write('          <Attribute Name="{}" Center="Cell" '
-                         'AttributeType="{}">\n'
+                fo.write('          <Attribute Name="{0}" Center="Cell" '
+                         'AttributeType="{1}">\n'
                          .format(field, xdmfAttrTypes[nCmp]))
                 
                 fo.write('            <DataStructure Format="HDF" '
-                         'DataType="Float" Precision="{}" Dimensions="{} {}">\n'
+                         'DataType="Float" Precision="{0}" Dimensions="{1} {2}">\n'
                          .format(prec, nCells[i], nCmp))
                 
-                fo.write('              {}:/FIELDS/{}/{}/{}\n'
+                fo.write('              {0}:/FIELDS/{1}/{2}/{3}\n'
                          .format(h5Path, timeName, proc, field))
                 
                 fo.write('            </DataStructure>\n')
@@ -305,12 +310,12 @@ parser.add_argument('-t','--latestTime',
 
 args = parser.parse_args()
 
-print('Reading from \'{}\''.format(args.input))
-print('Printing XDMF files to folder \'{}\''.format(args.dir))
+print('Reading from \'{0}\''.format(args.input))
+print('Printing XDMF files to folder \'{0}\''.format(args.dir))
 
 # Check if file exist
 if os.path.isfile(args.input) is False:
-    print('Error: File \'{}\' does not exist!'.format(args.input))
+    print('Error: File \'{0}\' does not exist!'.format(args.input))
     exit(1)
 
 # Open HDF5 file
@@ -325,8 +330,8 @@ except:
 # Write fields if present
 fieldsPresent = detectFields(f)
 if args.noFields is False and fieldsPresent:
-    fo = open('{}/fieldData.xdmf'.format(args.dir), 'w')
-    print('Writing field data to file {}'.format(fo.name))
+    fo = open('{0}/fieldData.xdmf'.format(args.dir), 'w')
+    print('Writing field data to file {0}'.format(fo.name))
     writeFields(f, fo, args)
     fo.close()
 else:
@@ -336,9 +341,9 @@ else:
 clouds = detectClouds(f)
 if args.noLagrangian is False and clouds:
     for cloud in clouds:
-        fo = open('{}/{}.xdmf'.format(args.dir, cloud), 'w')
+        fo = open('{0}/{1}.xdmf'.format(args.dir, cloud), 'w')
         H = f['CLOUDS'][cloud]
-        print('Writing cloud data for \'{}\' to {}'.format(cloud, fo.name))
+        print('Writing cloud data for \'{0}\' to {1}'.format(cloud, fo.name))
         writeCloud(H, fo, args)
         fo.close()
 else:
