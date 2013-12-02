@@ -1,14 +1,16 @@
 IOH5Write
 =========
 
+This is a fork from https://github.com/hakostra/IOH5Write. All credits go to him! I have just changed a few things to work with OpenFOAM-2.1.x and python-2.6
+
 Library that write OpenFOAM cases as HDF5 archives instead of the default one-file-per-process-per-timestep-per-variable approach. This saves a lot of files, makes it easier to manage, copy, and post-process the results. An XDMF file is used to describe the contents of the HDF5-file and this can easily be opened in ParaView, VisIt or any other common postprocessor tool. The IO part is handled by MPI-IO, which makes it effective on clusters and high-performance computers with thousands of nodes and parallel file systems.
 
 
 Installation
 ------------
-1. Make sure you have a working copy of OpenFOAM 2.2.0, 2.2.1 or 2.2.x. Make sure that you have all necessary compilers and development libraries, including MPI.
+1. Make sure you have a working copy of OpenFOAM 2.1.x. Make sure that you have all necessary compilers and development libraries, including MPI.
 2. Install the HDF5-library. Make sure that you install or compile it with parallel/MPI support. In Ubuntu this is done by installing the package ``libhdf5-openmpi-dev``. I guess it is necessary to compile both OpenFOAM and HDF5 against the same MPI library and version. I use the OpenMPI that is supplied with my system, and have compiled both OpenFOAM and HDF5 against this.
-3. Grab a copy of this repository, and enter the code directory. You can for example place the code in your ``~/OpenFOAM/username-2.2.x`` folder.
+3. Grab a copy of this repository, and enter the code directory. You can for example place the code in your ``~/OpenFOAM/username-2.1.x`` folder.
 4. Set the environment variable ``HDF5_DIR`` to your HDF5 installation directory (this might f.ex. be ``/usr``). Make the variable "visible" for the compile script (e.g. ``export HDF5_DIR=/usr``) before you compile.
 5. Compile the code with the common ``./Allwmake`` and wait.
 
@@ -35,8 +37,6 @@ Writing XDMF files
 ------------------
 The XDMF files is written *after* the simulation is finished by using the python script 'writeXDMF.py'. The script will, if not supplied with any additional arguments, parse the file 'h5Data/h5Data0.h5', and write the resulting XDMF files in a folder called 'xdmf'. One XDMF-file will be created for the field/mesh data, and one XDMF-file will be created for each cloud of particles. Usage instructions can be given with the option --help.
 
-In case someone is interested, two (obsolete) Matlab-scripts that parse HDF5-files is also supplied. These do not have the same functionality or usability as the Python-script mentioned above, and they are not maintained.
-
 
 Testing
 -------
@@ -55,5 +55,5 @@ There are a few known bugs and limitations:
 
 Found yet another bug? Got suggestions for improvements?
 ----------------------------------------------
-Feel free to contact me in the discussion thread at [www.cfd-online.com](http://www.cfd-online.com/Forums/openfoam-programming-development/122579-hdf5-io-library-openfoam.html).
+Feel free to contact Hakon in the discussion thread at [www.cfd-online.com](http://www.cfd-online.com/Forums/openfoam-programming-development/122579-hdf5-io-library-openfoam.html).
 
